@@ -1,129 +1,78 @@
-This readme
-Original written by Steve Arnold https://github.com/sarnold/pitft-weather-display
+The Original code written by Jim Kemp http://www.ph-elec.com/
 
-
-===========================================================
- Weather.py - A PyGame-based weather data/forecast display
-===========================================================
-
-Original code written by Jim Kemp http://www.ph-elec.com/
+========================================
+ Raspberry Pi Internet Weather Station
+========================================
 
 Downloaded from:
 
 http://www.instructables.com/id/Raspberry-Pi-Internet-Weather-Station/step4/Source-Code/
 
-Dependencies
+
+This README.rst contains instructions extracted from the above link: 
+
+
+Installation
 ============
+Install Pywapi:
+The pywapi needs to be downloaded and installed. Again, this is not too hard with the following steps:
 
-Python:
+    Download the latest from here:
+    https://launchpad.net/python-weather-api/trunk/0.3.8/+download/pywapi-0.3.8.tar.gz 
+    Extract the archive into a new directory.
+    Using File Manger, copy the directory to the Pi home directory.
+    Using ssh, do the following on the Pi:
+        $ cd pywapi-0.3.8
+        $ sudo python setup.py build
+        $ sudo python setup.py install
+    Done.
 
-* pywapi - https://pypi.python.org/pypi/pywapi
-* schedule - https://pypi.python.org/pypi/schedule
-* pygame - https://pypi.python.org/pypi/Pygame
 
-If there is no deb package for any of the above, try "pip install [package_name]".
+Install Pygame:
+Just install it from your repository using:
+        $ sudo apt-get install python-pygame
 
-Also, for buttons and usb-serial X10 interfaces:
 
-* RPi.GPIO (should already be installed in Raspbian)
-* python-serial
+Install and run:
+To get my source code running just unzip the attachment and copy the whole directory onto the Pi using File Manage. Once copied, start the code use the following ssh commands:
+        $ cd Weather
+        $ sudo python weather.py
 
-The Basics
-==========
 
-The old behavior (see legacy branch) was to stay on the weather display all
-the time; using the keyboard to switch displays would automatically switch
-back to the weather display after five minutes.  The new behavior is to
-switch between the weather and site-info displays once each minute (nominal).
+Autorun after boot:
+Once everything gets working using ssh it's time to get weather to start automatically on a reboot. This is also really easy to do.
 
-The site-info (help) display starts on the minute and then waits for approx. one
-minute to switch.  The weather data lookup is now run via scheduler (instead
-of being tied to the one-minute display cycle) and defaults to 15 minutes
-(since external observations are hourly).
+    Using ssh, run:
+        $ sudo vi /etc/rc.local"
 
-The code still supports GPIO buttons (eg, for a small PiTFT display) but the
-X-10 serial interface is commented out.
+    Just before the last line, which says "exit 0", add the following to lines.
+        $ cd /home/pi/Weather
+        $ sudo python weather.py &> err.log
 
-The code requires a network interface for time and weather data sync (currently
-uses weather.com).  On the updated master branch, set backlight_control to False
-if you don't want the display to dim during non-daylight hours. Use legacy branch
-if you want the original behavior.
+This will automatically start the weather application on the Pi after a reboot. If later you want to turn this off, just use ssh to edit the file and add the comment character "#" in front of both lines and reboot.
 
-To Localize
-===========
 
+A couple of other things to note about my code. Buried down in there you'll notice some code to talk to an X10 device. This was my attempt to control my outside pole lights that are on address A3. I simply wanted the lamps on at dusk and off at dawn. Seems easy enough and I thought I had it working. Using a USB-to-RS232 dongle on the Pi I had connected a CM11A X10 module. The CM11A is an old X10 macro module. The CM11A also has a RS232 port that allows control over the X10 bus. Seems there are still some bugs because the lamp pole lights aren't getting the message!
+
+Also of note, on the larger display there is a nice open gap along the right hand side of the display. My plan is add some status lamps in that area. I'm playing with some IEEE802.15.4 radios and their outputs will one day show up in that open spot.
+
+
+
+Set your own settings
+=====================
 Edit weather.py and change the following as needed:
 
 * Zip code in UpdateWeather function
 * Display size depending on your display (see comments)
-* backlight_control and tap_mode
-
-To run from a console
-=====================
-
-Change to Weather source directory and run the command::
-
-  $ DISPLAY=:0 python weather.py
-
-To run in the background with logging, try::
-
-  DISPLAY=:0 python -u weather.py > >(tee -a out.log) 2> >(tee err.log >&2) &
 
 
-Keyboard and Touch Controls
-===========================
 
-The main keyboard and touch controls only depend on pygame, however, if
-backlight_control is enabled, touch_mode="backlight" depends on the
-rpi-backlight tool (see below).  If you don't have the required display
-hardware, set backlight_control="False".
-
-* Keyboard controls
-
+Keyboard Controls
+=================
   * q or keypad Enter - quit program
-  * u or keypad '+' - raise backlight 10%
-  * d or keypad '-' - lower backlight 10%
   * c - switch to calendar display
   * w - switch to weather display
   * h - switch to site info display
 
-* Touch / Click controls
 
-  * tap_mode unset
 
-    * double-tap - quit program
-    * single-tap - does nothing
-
-  * tap_mode="backlight"
-
-    * double-tap - turn backlight off
-    * single-tap - turn backlight on
-
-.. note:: The backlight min/max commands are controlled by schedulers
-          according to sunrise/sunset.
-
-Pi Foundation Touch Display
-===========================
-
-For rpi-backlight control on this display, install
-
-* rpi-backlight
-
-The rpi-backlight tool is available either via deb package or manual build/install;
-see `the rpi-backlight github repo`_ and the `deb package build howto`_ for details.
-
-.. _the rpi-backlight github repo: https://github.com/sarnold/rpi-backlight
-.. _deb package build howto: https://github.com/sarnold/af_alg/blob/master/deb-build-howto.rst
-
-Mostly you can ignore the sources.list and other setup details, just install the
-build dependencies, clone the repo, cd and run the build command, then install it::
-
-  $ sudo apt-get install devscripts build-essential
-  $ cd ~/src
-  $ git clone https://github.com/sarnold/rpi-backlight
-  $ cd rpi-backlight
-  $ debuild -b -uc -us
-  $ sudo dpkg -i ../rpi-backlight_0.0.1-1-raspbian+1_armhf.deb
-
-.. note:: rpi-backlight only works with the Pi Foundation touch display:
-          https://www.raspberrypi.org/products/raspberry-pi-touch-display/
