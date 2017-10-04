@@ -23,7 +23,9 @@ The pywapi needs to be downloaded and installed. Again, this is not too hard wit
     Using File Manger, copy the directory to the Pi home directory.
     Using ssh, do the following on the Pi:
         $ cd pywapi-0.3.8
+        
         $ sudo python setup.py build
+        
         $ sudo python setup.py install
     Done.
 
@@ -35,7 +37,11 @@ Just install it from your repository using:
 
 Install and run:
 To get my source code running just unzip the attachment and copy the whole directory onto the Pi using File Manage. Once copied, start the code use the following ssh commands:
-        $ cd Weather
+        $ cd Weather  #if code downloaded from Instructables
+        
+        or
+        $ cd weather-display-master #if code downloaded from this repository
+        
         $ sudo python weather.py
 
 
@@ -46,7 +52,8 @@ Once everything gets working using ssh it's time to get weather to start automat
         $ sudo vi /etc/rc.local"
 
     Just before the last line, which says "exit 0", add the following to lines.
-        $ cd /home/pi/Weather
+        $ cd /home/pi/Weather  #if code downloded from instructables otherwise use $ cd /home/pi/weather-display-master
+        
         $ sudo python weather.py &> err.log
 
 This will automatically start the weather application on the Pi after a reboot. If later you want to turn this off, just use ssh to edit the file and add the comment character "#" in front of both lines and reboot.
