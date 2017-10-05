@@ -37,10 +37,11 @@ Just install it from your repository using:
 
 Install and run:
 To get my source code running just unzip the attachment and copy the whole directory onto the Pi using File Manage. Once copied, start the code use the following ssh commands:
-        $ cd Weather  #if code downloaded from Instructables
+        $ cd Weather  #if the code was downloaded from Instructables
         
         or
-        $ cd weather-display-master #if code downloaded from this repository
+        
+        $ cd weather-display-master   #if the code was downloaded from this repository
         
         $ sudo python weather.py
 
@@ -52,7 +53,9 @@ Once everything gets working using ssh it's time to get weather to start automat
         $ sudo vi /etc/rc.local"
 
     Just before the last line, which says "exit 0", add the following to lines.
-        $ cd /home/pi/Weather  #if code downloded from instructables otherwise use $ cd /home/pi/weather-display-master
+        $ cd /home/pi/Weather  #if the code was downloded from instructables 
+        
+        otherwise use $ cd /home/pi/weather-display-master #if the code was downloaded from this repository
         
         $ sudo python weather.py &> err.log
 
